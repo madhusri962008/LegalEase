@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegalEase - Legal Document Assistant</title>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --accent: #2563eb;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #64748b;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 12px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .tag.alert {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        #results {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>LegalEase</h1>
+            <p>Simplify legal agreements and identify critical risk factors.</p>
+        </header>
+
+        <div class="card">
+            <h3>Input Legal Document</h3>
+            <textarea id="documentText" placeholder="Paste your contract, agreement, or terms of service here..."></textarea>
+            <button onclick="analyzeContract()">Analyze Document</button>
+        </div>
+
+        <div class="card" id="results">
+            <h3>Document Summary & Clause Detection</h3>
+            <div id="clauseTags"></div>
+            <h4>Key Takeaways</h4>
+            <ul id="summaryList"></ul>
+        </div>
+    </div>
+
+    <script>
+        function analyzeContract() {
+            const text = document.getElementById('documentText').value.toLowerCase();
+            const resultsCard = document.getElementById('results');
+            const clauseTags = document.getElementById('clauseTags');
+            const summaryList = document.getElementById('summaryList');
+
+            if (!text.trim()) {
+                alert('Please enter text to analyze.');
+                return;
+            }
+
+            clauseTags.innerHTML = '';
+            summaryList.innerHTML = '';
+
+            const clauses = [
+                { keyword: 'termination', label: 'Termination Clause Found', alert: false },
+                { keyword: 'liability', label: 'Limitation of Liability', alert: true },
+                { keyword: 'confidential', label: 'Confidentiality/NDA', alert: false },
+                { keyword: 'governing law', label: 'Governing Law Specified', alert: false },
+                { keyword: 'indemnify', label: 'Indemnification Clause', alert: true }
+            ];
+
+            let matches = 0;
+
+            clauses.forEach(clause => {
+                if (text.includes(clause.keyword)) {
+                    matches++;
+                    const tag = document.createElement('span');
+                    tag.className = `tag ${clause.alert ? 'alert' : ''}`;
+                    tag.textContent = clause.label;
+                    clauseTags.appendChild(tag);
+                }
+            });
+
+            if (matches === 0) {
+                clauseTags.innerHTML = '<span>No standard key legal clauses automatically detected.</span>';
+            }
+
+            const wordCount = text.trim().split(/\s+/).length;
+            summaryList.innerHTML += `<li><strong>Document Length:</strong> ${wordCount} words</li>`;
+            summaryList.innerHTML += `<li><strong>Key Clause Matches:</strong> Identified ${matches} standard contractual sections.</li>`;
+
+            resultsCard.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
